@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Echo Radio List</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: transparent;
+            color: #e0e0e0;
+            overflow: hidden; 
+            font-size: 12px;
+        }
+
+        .radio-list-container {
+            position: absolute;
+            top: 15%;
+            right: 1%;
+            width: 140px;
+            box-sizing: border-box;
+            background: rgba(15, 15, 15, 0.9);
+            border-radius: 8px;
+            padding: 0;
+            overflow: hidden;
+            animation: appear 0.3s ease-out forwards;
+        }
+
+        #radio-list-header {
+            background: rgba(30, 30, 30, 0.9);
+            color: #ffffff;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 8px 0;
+            margin: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #radio-list-header::before {
+            content: "●";
+            color: #9EFF22;
+            font-size: 8px;
+            margin-right: 6px;
+            animation: pulse 1.5s infinite;
+        }
+        .radio-entries {
+            padding: 6px;
+            max-height: 180px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(15, 15, 15, 0.5) transparent;
+        }
+
+        .radio-entries::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .radio-entries::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .radio-entries::-webkit-scrollbar-thumb {
+            background-color: rgba(15, 15, 15, 0.5);
+            border-radius: 3px;
+        }
+
+        .radio-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 15, 15, 0.7);
+            margin-bottom: 4px;
+            border-radius: 4px;
+            padding: 6px 8px;
+            transition: all 0.15s ease;
+        }
+
+        .radio-entry:hover {
+            background: rgba(15, 15, 15, 0.9);
+        }
+
+        .radio-entry.you {
+            background: rgba(15, 15, 15, 0.9);
+            border-left: 2px solid #9EFF22;
+        }
+
+        .radio-name {
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90px;
+        }
+
+        .radio-tag {
+            background: rgba(15, 15, 15, 0.9);
+            border-radius: 3px;
+            padding: 2px 5px;
+            font-size: 9px;
+            font-weight: 600;
+            color: #aaa;
+        }
+
+        .you .radio-tag {
+            background: rgba(158, 255, 34, 0.2);
+            color: #9EFF22;
+        }
+
+        .talking {
+            background: rgba(50, 50, 50, 0.9) !important;
+            box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
+        }
+
+        .talking .radio-name {
+            color: #fff;
+        }
+
+        .talking .radio-tag {
+            color: #9EFF22;
+        }
+
+        .talking .radio-name::after {
+            content: '...';
+            display: inline-block;
+            margin-left: 4px;
+            animation: dots 1.4s infinite steps(4, end);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes dots {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes appear {
+            from { 
+                opacity: 0; 
+                transform: translateX(10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="radio-list-container" id="radio-list"></div>
+
+    <script>
+        window.addEventListener("message", function(event) {
+            const item = event.data;
+            const radioListElem = document.getElementById("radio-list");
+
+            if (item.radioId != null) {
+                if (!radioListElem.querySelector("#radio-list-header")) {
+                    const header = document.createElement("div");
+                    header.id = "radio-list-header";
+                    header.textContent =item.channel + " MHz";
+                    radioListElem.appendChild(header);
+
+                    const entriesContainer = document.createElement("div");
+                    entriesContainer.className = "radio-entries";
+                    radioListElem.appendChild(entriesContainer);
+                }
+
+                const entriesContainer = radioListElem.querySelector(".radio-entries");
+
+                if (item.radioName != null) {
+                    const listItem = document.createElement("div");
+                    listItem.id = "radio-list-item-" + item.radioId;
+                    listItem.className = "radio-entry" + (item.self ? " you" : "");
+                    
+                    listItem.innerHTML = `
+                        <span class="radio-name">${item.radioName}</span>
+                        <span class="radio-tag">${item.self ? 'YOU' : item.radioId}</span>
+                    `;
+                    
+                    entriesContainer.appendChild(listItem);
+
+                } else if (item.radioTalking != null) {
+                    const listItem = document.getElementById("radio-list-item-" + item.radioId);
+                    if (listItem) {
+                        listItem.classList.toggle("talking", item.radioTalking);
+                    }
+
+                } else {
+                    const listItem = document.getElementById("radio-list-item-" + item.radioId);
+                    if (listItem) {
+                        listItem.remove();
+                    }
+                }
+            }
+
+            if (item.clearRadioList) {
+                radioListElem.innerHTML = "";
+            }
+
+            if (item.changeVisibility) {
+                radioListElem.style.display = item.visible ? 'block' : 'none';
+            }
+        });
+    </script>
+</body>
+</html>
