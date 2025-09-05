@@ -4,60 +4,66 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Echo Radio List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
             background: transparent;
-            color: #e0e0e0;
-            overflow: hidden; 
-            font-size: 12px;
+            color: #e6e6e6;
+            overflow: hidden;
+            font-size: 13px;
         }
 
         .radio-list-container {
             position: absolute;
             top: 15%;
-            right: 1%;
-            width: 140px;
+            left: 1%;
+            width: 160px;
+            max-width: 90vw;
             box-sizing: border-box;
-            background: rgba(15, 15, 15, 0.9);
-            border-radius: 8px;
+            background: linear-gradient(180deg, rgba(20, 20, 20, 0.95), rgba(30, 30, 30, 0.9));
+            border-radius: 10px;
             padding: 0;
             overflow: hidden;
             animation: appear 0.3s ease-out forwards;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         #radio-list-header {
-            background: rgba(30, 30, 30, 0.9);
+            background: linear-gradient(90deg, rgba(40, 40, 40, 0.95), rgba(50, 50, 50, 0.9));
             color: #ffffff;
             text-align: center;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 8px 0;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 10px 0;
             margin: 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         #radio-list-header::before {
             content: "●";
-            color: #9EFF22;
-            font-size: 8px;
-            margin-right: 6px;
+            color: #ff4444;
+            font-size: 10px;
+            margin-right: 8px;
             animation: pulse 1.5s infinite;
         }
+
         .radio-entries {
-            padding: 6px;
-            max-height: 180px;
+            padding: 8px;
+            max-height: 400px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: rgba(15, 15, 15, 0.5) transparent;
+            scrollbar-color: rgba(80, 80, 80, 0.5) transparent;
         }
 
         .radio-entries::-webkit-scrollbar {
-            width: 3px;
+            width: 4px;
         }
 
         .radio-entries::-webkit-scrollbar-track {
@@ -65,98 +71,100 @@
         }
 
         .radio-entries::-webkit-scrollbar-thumb {
-            background-color: rgba(15, 15, 15, 0.5);
-            border-radius: 3px;
+            background-color: rgba(80, 80, 80, 0.5);
+            border-radius: 4px;
         }
 
         .radio-entry {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 15, 15, 0.7);
-            margin-bottom: 4px;
-            border-radius: 4px;
-            padding: 6px 8px;
-            transition: all 0.15s ease;
+            background: rgba(25, 25, 25, 0.8);
+            margin-bottom: 6px;
+            border-radius: 6px;
+            padding: 8px 10px;
+            transition: all 0.2s ease;
+            cursor: default;
         }
 
         .radio-entry:hover {
-            background: rgba(15, 15, 15, 0.9);
+            background: rgba(35, 35, 35, 0.9);
+            transform: scale(1.02);
         }
 
         .radio-entry.you {
-            background: rgba(15, 15, 15, 0.9);
-            border-left: 2px solid #9EFF22;
+            background: rgba(25, 25, 25, 0.9);
+            border-left: 3px solid #ff4444;
         }
 
         .radio-name {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 90px;
+            max-width: 100px;
         }
 
         .radio-tag {
-            background: rgba(15, 15, 15, 0.9);
-            border-radius: 3px;
-            padding: 2px 5px;
-            font-size: 9px;
+            background: rgba(50, 50, 50, 0.9);
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-size: 10px;
             font-weight: 600;
-            color: #aaa;
+            color: #bbb;
         }
 
         .you .radio-tag {
-            background: rgba(158, 255, 34, 0.2);
-            color: #9EFF22;
+            background: rgba(150, 150, 150, 0.8);
+            color: #ff4444;
         }
 
         .talking {
-            background: rgba(50, 50, 50, 0.9) !important;
-            box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
+            background: rgba(60, 60, 60, 0.9) !important;
+            box-shadow: 0 0 0 1.5px rgba(100, 200, 100, 0.4);
         }
 
         .talking .radio-name {
-            color: #fff;
+            color: #ffffff;
         }
 
         .talking .radio-tag {
-            color: #9EFF22;
+            color: #ff4444;
         }
 
-        .talking .radio-name::after {
-            content: '...';
+        .talking .radio-name::before {
+            content: "🎙️";
+            margin-right: 6px;
             display: inline-block;
-            margin-left: 4px;
-            animation: dots 1.4s infinite steps(4, end);
+            animation: wave 1.2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
+            0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
         }
 
-        @keyframes dots {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
+        @keyframes wave {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+            100% { transform: translateY(0); }
         }
 
         @keyframes appear {
-            from { 
-                opacity: 0; 
-                transform: translateX(10px); 
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
             }
-            to { 
-                opacity: 1; 
-                transform: translateX(0); 
+            to {
+                opacity: 1;
+                transform: translateX(0);
             }
         }
     </style>
 </head>
 <body>
-    <div class="radio-list-container" id="radio-list"></div>
+    <div class="radio-list-container" id="radio-list" role="region" aria-label="Radio List"></div>
 
     <script>
         window.addEventListener("message", function(event) {
@@ -167,11 +175,12 @@
                 if (!radioListElem.querySelector("#radio-list-header")) {
                     const header = document.createElement("div");
                     header.id = "radio-list-header";
-                    header.textContent =item.channel + " MHz";
+                    header.textContent = item.channel || "Unknown Channel";
                     radioListElem.appendChild(header);
 
                     const entriesContainer = document.createElement("div");
                     entriesContainer.className = "radio-entries";
+                    entriesContainer.setAttribute("role", "list");
                     radioListElem.appendChild(entriesContainer);
                 }
 
@@ -181,6 +190,8 @@
                     const listItem = document.createElement("div");
                     listItem.id = "radio-list-item-" + item.radioId;
                     listItem.className = "radio-entry" + (item.self ? " you" : "");
+                    listItem.setAttribute("role", "listitem");
+                    listItem.setAttribute("aria-label", item.radioName + (item.self ? " (You)" : ""));
                     
                     listItem.innerHTML = `
                         <span class="radio-name">${item.radioName}</span>
@@ -188,13 +199,12 @@
                     `;
                     
                     entriesContainer.appendChild(listItem);
-
                 } else if (item.radioTalking != null) {
                     const listItem = document.getElementById("radio-list-item-" + item.radioId);
                     if (listItem) {
                         listItem.classList.toggle("talking", item.radioTalking);
+                        listItem.setAttribute("aria-live", item.radioTalking ? "polite" : "off");
                     }
-
                 } else {
                     const listItem = document.getElementById("radio-list-item-" + item.radioId);
                     if (listItem) {
@@ -209,6 +219,11 @@
 
             if (item.changeVisibility) {
                 radioListElem.style.display = item.visible ? 'block' : 'none';
+            }
+
+            if (item.updatePosition) {
+                radioListElem.style.left = item.left + '%';
+                radioListElem.style.top = item.top + '%';
             }
         });
     </script>
